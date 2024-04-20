@@ -11,7 +11,6 @@ import Empty from "antd/es/empty";
 export default function FileCard() {
   return (
     <Card
-      style={{ width: 300 }}
       cover={Empty.PRESENTED_IMAGE_DEFAULT}
       actions={[
         <SettingOutlined key="setting" />,
