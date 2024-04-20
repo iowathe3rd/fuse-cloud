@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      String @id @default(uuid())
+  clerkId String @unique
+
+  // General user data
+  username String  @unique
+  email    String? @unique
+  password String
+
+  // User files
+  files File[]
+
+  // User usage data
+  usedSpace Int  @default(0) // Использованное пространство в байтах
+  plan      Plan @default(FREE) // План пользователя (free, pro, ultra)
+}
+
+model File {
+  id String @id @default(uuid())
+
+  // General file data
+  filename    String
+  path        String
+  size        Int // Размер файла в байтах
+  extension   String // Расширение файла
+  mimeType    String? // Тип MIME файла
+  author      String? // Автор файла
+  description String? // Описание файла
+
+  // File can be public
+  isPublic Boolean @default(false)
+
+  // Key for aws entity
+  s3Key String?
+
+  // File owner data
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  // Date created/updated
+  createdAt DateTime @default(now()) // Дата создания файла
+  updatedAt DateTime @updatedAt // Дата последнего обновления файла
+
+  // File tags, for some filtering
+  tags  String[] // Теги файла
+  Tag   Tag?     @relation(fields: [tagId], references: [id])
+  tagId Int?
+}
+
+enum Plan {
+  FREE
+  PRO
+  ULTRA
+}
